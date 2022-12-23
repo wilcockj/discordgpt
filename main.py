@@ -8,7 +8,6 @@ from io import StringIO
 from dotenv import load_dotenv, find_dotenv
 
 load_dotenv()
-#https://discord.com/oauth2/authorize?client_id=1055708615761199185&permissions=0&scope=bot%20applications.commands
 
 logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.DEBUG)
 description = '''An example bot to showcase the discord.ext.commands extension
