@@ -15,8 +15,6 @@ description = '''An example bot to showcase the discord.ext.commands extension
 module.
 There are a number of utility commands being showcased here.'''
 
-print(os.getenv("OPENAI_API_KEY"))
-print(os.getenv("DISCORD_KEY"))
 openai.api_key = os.getenv("OPENAI_API_KEY")
 openai.Model.list()
 
