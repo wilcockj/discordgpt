@@ -9,12 +9,13 @@ import logging.handlers
 import textwrap
 from io import StringIO
 from dotenv import load_dotenv, find_dotenv
-
+import sqlite3
+import time
 load_dotenv()
 
 
 logger = logging.getLogger('discord')
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 
 handler = logging.handlers.RotatingFileHandler(
     filename='discord.log',
@@ -25,14 +26,35 @@ handler = logging.handlers.RotatingFileHandler(
 dt_fmt = '%Y-%m-%d %H:%M:%S'
 formatter = logging.Formatter('[{asctime}] [{levelname:<8}] {name}: {message}', dt_fmt, style='{')
 handler.setFormatter(formatter)
+consolehandler = logging.StreamHandler()
+consolehandler.setFormatter(formatter)
+consolehandler.setLevel(logging.INFO)
 logger.addHandler(handler)
+logger.addHandler(consolehandler)
 
-description = '''An example bot to showcase the discord.ext.commands extension
-module.
-There are a number of utility commands being showcased here.'''
+description = '''Bot for ai things like gpt and dalle'''
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 openai.Model.list()
+
+def add_data(time,query,reply):
+    # Connect to the database
+    conn = sqlite3.connect("database.db")
+
+    # Create a cursor
+    cursor = conn.cursor()
+    # Insert a row into the table
+    cursor.execute("INSERT INTO queries (time, input, output) VALUES (?, ?, ?)", (time, query, reply))
+
+    # Commit the changes
+    conn.commit()
+
+    # Close the connection
+    conn.close()
+
+
+
+
 
 def word_count(str):
     counts = dict()
@@ -57,7 +79,6 @@ def getGPTComplete(input):
     frequency_penalty=0.0,
     presence_penalty=0.0
     )
-    logger.info(response)
     finish_reason = response['choices'][0]['finish_reason'] 
     text = response['choices'][0]['text'] 
     logger.info(f"Got response from gpt3 back with length {len(text.split())} from input \"{input}\"")
@@ -91,7 +112,11 @@ async def on_ready():
 @bot.hybrid_command(name="getgpt")
 async def getgpt(ctx, *,query : str):
     await ctx.defer(ephemeral=True)
+    start_time = time.time() 
     finish_reason,resp = getGPTComplete(query)
+    total_time = time.time() - start_time
+    total_time = round(total_time,2)
+    logger.info(f"GPT query for input \"{query}\" took {total_time}s")
     messages = textwrap.wrap(resp,1900)
     messageswithdot = []
     if len(messages) > 1:
@@ -101,8 +126,10 @@ async def getgpt(ctx, *,query : str):
         messages = messageswithdot
     if len(messages) > 0:
         messages[0] = f"Prompt: \"{query}\"\nResponse:" + messages[0]
+        add_data(total_time,query,resp)
     else: 
         messages = [f"Prompt: \"{query}\"\nResponse: No response\nReason: {finish_reason}"]
+        add_data(total_time,query,f"Failed due to reason: {finish_reason}")
     for message in messages:
         await ctx.send(message)
 
@@ -147,6 +174,28 @@ async def sync(
 
     await ctx.send(f"Synced the tree to {ret}/{len(guilds)}.")
    
-    
+def create_db():
+    # Connect to the database
+    conn = sqlite3.connect("database.db")
 
-bot.run(os.getenv("DISCORD_KEY"))
+    # Create a cursor
+    cursor = conn.cursor()
+
+    # Check if the table exists
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='queries'")
+
+    # If the table does not exist, create it
+    if not cursor.fetchone():
+        cursor.execute("CREATE TABLE queries (time REAL, input TEXT, output TEXT)")
+
+    # Commit the changes
+    conn.commit()
+
+    # Close the connection
+    conn.close()
+
+    
+create_db()
+
+
+bot.run(os.getenv("DISCORD_KEY"), log_handler=None)
