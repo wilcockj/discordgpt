@@ -57,9 +57,11 @@ def getGPTComplete(input):
     frequency_penalty=0.0,
     presence_penalty=0.0
     )
+    logger.info(response)
+    finish_reason = response['choices'][0]['finish_reason'] 
     text = response['choices'][0]['text'] 
     logger.info(f"Got response from gpt3 back with length {len(text.split())} from input \"{input}\"")
-    return text
+    return finish_reason, text
 
 intents = discord.Intents.default()
 intents.members = True
@@ -74,7 +76,7 @@ async def on_ready():
 @bot.hybrid_command(name="getgpt")
 async def getgpt(ctx, *,query : str):
     await ctx.defer(ephemeral=True)
-    resp = getGPTComplete(query)
+    finish_reason,resp = getGPTComplete(query)
     messages = textwrap.wrap(resp,1900)
     messageswithdot = []
     if len(messages) > 1:
@@ -82,7 +84,10 @@ async def getgpt(ctx, *,query : str):
             messageswithdot.append(x + "...")
         messageswithdot.append(messages[-1])
         messages = messageswithdot
-    messages[0] = f"Prompt: {query}\nResponse:" + messages[0]
+    if len(messages) > 0:
+        messages[0] = f"Prompt: \"{query}\"\nResponse:" + messages[0]
+    else: 
+        messages = [f"Prompt: \"{query}\"\nResponse: No response\nReason: {finish_reason}"]
     for message in messages:
         await ctx.send(message)
     
