@@ -165,7 +165,7 @@ async def getdalle(ctx, *,query : str):
         await ctx.message.reply(file=image_file)
 
         #await ctx.message.reply(file=discord.File("image.png"))
-    elif image != "Error" and not ctx.interaction:
+    elif image != "Error" and ctx.interaction:
         uuidyeah = uuid.uuid1()
         image_file = discord.File(buffer,filename=f"images/{uuidyeah}.png")
         await ctx.send(file=image_file)
