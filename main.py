@@ -98,8 +98,6 @@ def getDALLE(input):
         image_url = response['data'][0]['url']
         logger.info(f"Got response from dalle back {image_url} from input \"{input}\"")
         r = requests.get(image_url)
-        with open('image.png','wb') as output:
-            output.write(r.content)
         buffer = BytesIO(r.content)
     except openai.error.OpenAIError as e:
         logger.error(f"Error creating dalle image {e.http_status} {e.error}")
