@@ -111,6 +111,8 @@ async def on_ready():
 
 @bot.hybrid_command(name="getgpt")
 async def getgpt(ctx, *,query : str):
+    if not ctx.interaction:
+        sent = await ctx.message.reply("Processing!")
     await ctx.defer(ephemeral=True)
     start_time = time.time() 
     finish_reason,resp = getGPTComplete(query)
@@ -130,6 +132,9 @@ async def getgpt(ctx, *,query : str):
     else: 
         messages = [f"Prompt: \"{query}\"\nResponse: No response\nReason: {finish_reason}"]
         add_data(total_time,query,f"Failed due to reason: {finish_reason}")
+    
+    if not ctx.interaction:
+        await sent.delete()
     for message in messages:
         await ctx.send(message)
 
