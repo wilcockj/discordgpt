@@ -100,10 +100,11 @@ def getDALLE(input):
         r = requests.get(image_url)
         with open('image.png','wb') as output:
             output.write(r.content)
+        buffer = BytesIO(r.content)
     except openai.error.OpenAIError as e:
         logger.error(f"Error creating dalle image {e.http_status} {e.error}")
         image_url = "Error"
-    buffer = BytesIO(r.content)
+        buffer = None
     return image_url, buffer
 
 intents = discord.Intents.default()
