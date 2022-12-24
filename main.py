@@ -66,6 +66,7 @@ intents.members = True
 intents.message_content = True
 
 bot = commands.Bot(command_prefix='?', description=description, intents=intents)
+
 @bot.event
 async def on_ready():
     logger.info(f'Logged in as {bot.user} (ID: {bot.user.id})\n--------')
@@ -84,30 +85,6 @@ async def getgpt(ctx, *,query : str):
 
     for message in messages:
         await ctx.send(message)
-
-class MyCog(commands.Cog):
-  def __init__(self, bot: commands.Bot) -> None:
-    self.bot: commands.Bot = bot
-  
-  @commands.hybrid_command(name="getgpt")
-  async def getgpt(self, ctx: commands.Context, *, query : str) -> None:
-    """
-    This command is actually used as an app command AND a message command.
-    This means it is invoked with `?ping` and `/ping` (once synced, of course).
-    """
-    resp = getGPTComplete(query)
-    messages = textwrap.wrap(resp,1900)
-    messageswithdot = []
-    if len(messages) > 1:
-        for x in messages[:-1]:
-            messageswithdot.append(x + "...")
-        messageswithdot.append(messages[-1])
-        messages = messageswithdot
-
-    for message in messages:
-        await ctx.send(message)
-    # we use ctx.send and this will handle both the message command and app command of sending.
-    # added note: you can check if this command is invoked as an app command by checking the `ctx.interaction` attribute.
     
 @bot.command()
 @commands.guild_only()
@@ -144,7 +121,5 @@ async def sync(
     await ctx.send(f"Synced the tree to {ret}/{len(guilds)}.")
    
     
-async def setup(bot: commands.Bot) -> None:
-  await bot.add_cog(MyCog(bot))
 
 bot.run(os.getenv("DISCORD_KEY"))
