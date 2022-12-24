@@ -140,8 +140,12 @@ async def getgpt(ctx, *,query : str):
 
 @bot.hybrid_command(name="getdalle")
 async def getdalle(ctx, *,query : str):
+    if not ctx.interaction:
+        sent = await ctx.message.reply("Processing!")
     await ctx.defer(ephemeral=True)
     image_url = getDALLE(query)
+    if not ctx.interaction:
+        await sent.delete()
     await ctx.send(image_url)
 
 
