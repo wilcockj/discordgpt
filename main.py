@@ -63,6 +63,21 @@ def getGPTComplete(input):
     logger.info(f"Got response from gpt3 back with length {len(text.split())} from input \"{input}\"")
     return finish_reason, text
 
+def getDALLE(input):
+    logger.info(f"Sending query for dalle with message \"{input}\"")
+    try:
+        response = openai.Image.create(
+        prompt=input,
+        n=1,
+        size="512x512"
+        )
+        image_url = response['data'][0]['url']
+        logger.info(f"Got response from dalle back {image_url} from input \"{input}\"")
+    except openai.error.OpenAIError as e:
+        logger.error("Error creating dalle image",e.http_status,e.error)
+        image_url = "Error"
+    return image_url
+
 intents = discord.Intents.default()
 intents.members = True
 intents.message_content = True
@@ -90,7 +105,14 @@ async def getgpt(ctx, *,query : str):
         messages = [f"Prompt: \"{query}\"\nResponse: No response\nReason: {finish_reason}"]
     for message in messages:
         await ctx.send(message)
-    
+
+@bot.hybrid_command(name="getdalle")
+async def getdalle(ctx, *,query : str):
+    await ctx.defer(ephemeral=True)
+    image_url = getDALLE(query)
+    await ctx.send(image_url)
+
+
 @bot.command()
 @commands.guild_only()
 @commands.is_owner()
