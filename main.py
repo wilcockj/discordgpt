@@ -8,10 +8,12 @@ import logging
 import logging.handlers
 import textwrap
 from io import StringIO
+from io import BytesIO
 from dotenv import load_dotenv, find_dotenv
 import sqlite3
 import time
 import requests
+import uuid
 load_dotenv()
 
 
@@ -101,8 +103,8 @@ def getDALLE(input):
     except openai.error.OpenAIError as e:
         logger.error(f"Error creating dalle image {e.http_status} {e.error}")
         image_url = "Error"
-    
-    return image_url 
+    buffer = BytesIO(r.content)
+    return image_url, buffer
 
 intents = discord.Intents.default()
 intents.members = True
@@ -149,7 +151,7 @@ async def getdalle(ctx, *,query : str):
         sent = await ctx.message.reply("Processing!")
     await ctx.defer(ephemeral=True)
     start_time = time.time() 
-    image = getDALLE(query)
+    image, buffer = getDALLE(query)
     total_time = time.time() - start_time
     total_time = round(total_time,2)
     logger.info(f"DALLE query for input \"{query}\" took {total_time}s")
@@ -158,10 +160,15 @@ async def getdalle(ctx, *,query : str):
         await sent.delete()
     if image != "Error" and not ctx.interaction:
         add_data(total_time,query,image)
-        await ctx.message.reply(file=discord.File("image.png"))
+        uuidyeah = uuid.uuid1()
+        image_file = discord.File(buffer,filename=f"images/{uuidyeah}.png")
+        await ctx.message.reply(file=image_file)
+
+        #await ctx.message.reply(file=discord.File("image.png"))
     elif image != "Error" and not ctx.interaction:
-        add_data(total_time,query,image)
-        await ctx.send(file=discord.File("image.png"))
+        uuidyeah = uuid.uuid1()
+        image_file = discord.File(buffer,filename=f"images/{uuidyeah}.png")
+        await ctx.send(file=image_file)
     elif not ctx.interaction:
         await ctx.message.reply("Error, try a different prompt")
     else:
