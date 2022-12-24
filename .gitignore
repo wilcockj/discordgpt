@@ -2,3 +2,4 @@ venv/
 .env
 notes.txt
 discord.log
+database.db
