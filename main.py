@@ -11,6 +11,7 @@ from io import StringIO
 from dotenv import load_dotenv, find_dotenv
 import sqlite3
 import time
+import requests
 load_dotenv()
 
 
@@ -94,10 +95,14 @@ def getDALLE(input):
         )
         image_url = response['data'][0]['url']
         logger.info(f"Got response from dalle back {image_url} from input \"{input}\"")
+        r = requests.get(image_url)
+        with open('image.png','wb') as output:
+            output.write(r.content)
     except openai.error.OpenAIError as e:
-        logger.error("Error creating dalle image",e.http_status,e.error)
+        logger.error(f"Error creating dalle image {e.http_status} {e.error}")
         image_url = "Error"
-    return image_url
+    
+    return image_url 
 
 intents = discord.Intents.default()
 intents.members = True
@@ -143,10 +148,15 @@ async def getdalle(ctx, *,query : str):
     if not ctx.interaction:
         sent = await ctx.message.reply("Processing!")
     await ctx.defer(ephemeral=True)
-    image_url = getDALLE(query)
+    image = getDALLE(query)
     if not ctx.interaction:
         await sent.delete()
-    await ctx.send(image_url)
+    if image != "Error" and not ctx.interaction:
+        await ctx.message.reply(file=discord.File("image.png"))
+    elif not ctx.interaction:
+        await ctx.message.reply("Error, try a different prompt")
+    else:
+        await ctx.send("Error, try a different prompt")
 
 
 @bot.command()
