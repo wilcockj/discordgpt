@@ -82,7 +82,7 @@ async def getgpt(ctx, *,query : str):
             messageswithdot.append(x + "...")
         messageswithdot.append(messages[-1])
         messages = messageswithdot
-
+    messages[0] = f"Prompt: {query}\nResponse:" + messages[0]
     for message in messages:
         await ctx.send(message)
     
