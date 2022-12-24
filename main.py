@@ -148,11 +148,20 @@ async def getdalle(ctx, *,query : str):
     if not ctx.interaction:
         sent = await ctx.message.reply("Processing!")
     await ctx.defer(ephemeral=True)
+    start_time = time.time() 
     image = getDALLE(query)
+    total_time = time.time() - start_time
+    total_time = round(total_time,2)
+    logger.info(f"DALLE query for input \"{query}\" took {total_time}s")
+
     if not ctx.interaction:
         await sent.delete()
     if image != "Error" and not ctx.interaction:
+        add_data(total_time,query,image)
         await ctx.message.reply(file=discord.File("image.png"))
+    elif image != "Error" and not ctx.interaction:
+        add_data(total_time,query,image)
+        await ctx.send(file=discord.File("image.png"))
     elif not ctx.interaction:
         await ctx.message.reply("Error, try a different prompt")
     else:
