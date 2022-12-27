@@ -1,0 +1,11 @@
+version: "3.11"
+services:
+  discordgpt:
+    build: 
+      dockerfile: Dockerfile
+      context: '.'
+    volumes:
+      - .:/home/discordgpt
+    env_file:
+      - .env
+

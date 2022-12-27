@@ -1,7 +1,8 @@
 FROM python:3.11.1-buster
 ENV PYTHONUNBUFFERED=1
+WORKDIR /home/discordgpt
 
 COPY main.py requirements.txt ./
 RUN pip install -r requirements.txt
 
-CMD ["/venv/bin/python3", "main.py"]
+CMD ["python3", "main.py"]
