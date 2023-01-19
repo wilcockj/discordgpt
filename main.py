@@ -140,7 +140,9 @@ async def on_presence_update(before, after):
             print(f'{after.name} is now online at {datetime.now()}')
             if after.name not in user_data:
                 user_data[after.name] = {'online_times': []}
-            user_data[after.name]['online_times'].append({'start': datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'end': None})
+            onlinetime = {'start': datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'end': None}
+            if onlinetime not in user_data[after.name]['online_times']:
+                user_data[after.name]['online_times'].append(onlinetime)
         elif after.status == discord.Status.offline:
             print(f'{after.name} is now offline at {datetime.now()}')
             for i in range(len(user_data[after.name]['online_times'])):
