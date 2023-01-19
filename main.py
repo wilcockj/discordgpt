@@ -171,7 +171,7 @@ async def getgpt(ctx, *, query: str):
     for message in messages:
         await ctx.send(message)
 
-@bot.hybrid_command(name="getgpt")
+@bot.hybrid_command(name="getcodex")
 async def getcodex(ctx, *, query: str):
     user = ctx.message.author
     breakpoint()
