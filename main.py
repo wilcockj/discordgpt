@@ -94,6 +94,23 @@ def getGPTComplete(input):
     )
     return finish_reason, text
 
+def getCodexComplete(input):
+    logger.info(f'Sending query for gpt3 with message "{input}"')
+    response = openai.Completion.create(
+        engine="code-davinci-002",
+        prompt=input,
+        temperature=0.7,
+        max_tokens=8000,
+        top_p=1.0,
+        frequency_penalty=0.0,
+        presence_penalty=0.0,
+    )
+    finish_reason = response["choices"][0]["finish_reason"]
+    text = response["choices"][0]["text"]
+    logger.info(
+        f'Got response from gpt3 back with length {len(text.split())} from input "{input}"'
+    )
+    return finish_reason, text
 
 def getDALLE(input):
     logger.info(f'Sending query for dalle with message "{input}"')
@@ -130,6 +147,39 @@ async def getgpt(ctx, *, query: str):
     await ctx.defer(ephemeral=True)
     start_time = time.time()
     finish_reason, resp = getGPTComplete(query)
+    total_time = time.time() - start_time
+    total_time = round(total_time, 2)
+    logger.info(f'GPT query for input "{query}" took {total_time}s')
+    messages = textwrap.wrap(resp, 1900)
+    messageswithdot = []
+    if len(messages) > 1:
+        for x in messages[:-1]:
+            messageswithdot.append(x + "...")
+        messageswithdot.append(messages[-1])
+        messages = messageswithdot
+    if len(messages) > 0:
+        messages[0] = f'Prompt: "{query}"\nResponse:' + messages[0]
+        add_data(total_time, query, resp)
+    else:
+        messages = [
+            f'Prompt: "{query}"\nResponse: No response\nReason: {finish_reason}'
+        ]
+        add_data(total_time, query, f"Failed due to reason: {finish_reason}")
+
+    if not ctx.interaction:
+        await sent.delete()
+    for message in messages:
+        await ctx.send(message)
+
+@bot.hybrid_command(name="getgpt")
+async def getcodex(ctx, *, query: str):
+    user = ctx.message.author
+    breakpoint()
+    if not ctx.interaction:
+        sent = await ctx.message.reply("Processing!")
+    await ctx.defer(ephemeral=True)
+    start_time = time.time()
+    finish_reason, resp = getCodexComplete(query)
     total_time = time.time() - start_time
     total_time = round(total_time, 2)
     logger.info(f'GPT query for input "{query}" took {total_time}s')
