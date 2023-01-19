@@ -136,7 +136,7 @@ async def on_presence_update(before, after):
             user_data = {}
             json.dump(user_data, log_file)
             log_file.flush()
-        if after.status == discord.Status.online:
+        if after.status == discord.Status.online and before.status != discord.Status.idle:
             print(f'{after.name} is now online at {datetime.now()}')
             if after.name not in user_data:
                 user_data[after.name] = {'online_times': []}
