@@ -151,7 +151,6 @@ async def on_presence_update(before, after):
                     break
         out_file = open("user_status.json", "w")
         json.dump(user_data, out_file)
-        log_file.flush()
       
 
 @bot.hybrid_command(name="getgpt")
