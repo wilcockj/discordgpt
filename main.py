@@ -123,7 +123,7 @@ async def on_ready():
     logger.info(f"Logged in as {bot.user} (ID: {bot.user.id})\n--------")
 
 @bot.event
-async def on_member_update(before, after):
+async def on_presence_update(before, after):
     if before.status != after.status:         
         logger.info(f'{after} is now {after.status}')  
     logger.info(f'status is {after}')  
