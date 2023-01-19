@@ -146,7 +146,8 @@ async def on_presence_update(before, after):
                 if user_data[after.name]['online_times'][i]['end'] is None:
                     user_data[after.name]['online_times'][i]['end'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                     break
-        json.dump(user_data, 'user_status.json')
+        out_file = open("user_status.json", "w")
+        json.dump(user_data, out_file)
         log_file.flush()
       
 
