@@ -62,19 +62,10 @@ def add_data(time, query, reply):
     # Close the connection
     conn.close()
 
-
-def word_count(str):
-    counts = dict()
-    words = str.split()
-
-    for word in words:
-        if word in counts:
-            counts[word] += 1
-        else:
-            counts[word] = 1
-
-    return counts
-
+@bot.event
+async def on_member_update(before, after):
+    if before.status != after.status:         
+        logger.info(f'{after} is now {after.status}')  
 
 def getGPTComplete(input):
     logger.info(f'Sending query for gpt3 with message "{input}"')
