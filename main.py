@@ -174,7 +174,6 @@ async def getgpt(ctx, *, query: str):
 @bot.hybrid_command(name="getcodex")
 async def getcodex(ctx, *, query: str):
     user = ctx.message.author
-    breakpoint()
     if not ctx.interaction:
         sent = await ctx.message.reply("Processing!")
     await ctx.defer(ephemeral=True)
