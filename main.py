@@ -62,10 +62,6 @@ def add_data(time, query, reply):
     # Close the connection
     conn.close()
 
-@bot.event
-async def on_member_update(before, after):
-    if before.status != after.status:         
-        logger.info(f'{after} is now {after.status}')  
 
 def getGPTComplete(input):
     logger.info(f'Sending query for gpt3 with message "{input}"')
@@ -124,6 +120,11 @@ intents.message_content = True
 
 bot = commands.Bot(command_prefix="?", description=description, intents=intents)
 
+
+@bot.event
+async def on_member_update(before, after):
+    if before.status != after.status:         
+        logger.info(f'{after} is now {after.status}')  
 
 @bot.event
 async def on_ready():
