@@ -87,7 +87,7 @@ def getCodexComplete(input):
         engine="code-davinci-002",
         prompt=input,
         temperature=0.7,
-        max_tokens=8000,
+        max_tokens=3000,
         top_p=1.0,
         frequency_penalty=0.0,
         presence_penalty=0.0,
