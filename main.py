@@ -14,6 +14,7 @@ import sqlite3
 import time
 import requests
 import uuid
+import json
 
 load_dotenv()
 
@@ -126,7 +127,28 @@ async def on_ready():
 async def on_presence_update(before, after):
     if before.status != after.status:         
         logger.info(f'{after} is now {after.status}')  
-    logger.info(f'status is {after}')  
+        if os.path.exists('user_status.json'):
+            with open('user_status.json', 'r') as log_file:
+                user_data = json.load(log_file)
+        else:
+            log_file = open('user_status.json', 'w')
+            user_data = {}
+            json.dump(user_data, log_file)
+            log_file.flush()
+        if after.status == discord.Status.online:
+            print(f'{after.name} is now online at {datetime.now()}')
+            if after.name not in user_data:
+                user_data[after.name] = {'online_times': []}
+            user_data[after.name]['online_times'].append({'start': datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'end': None})
+        elif after.status == discord.Status.offline:
+            print(f'{after.name} is now offline at {datetime.now()}')
+            for i in range(len(user_data[after.name]['online_times'])):
+                if user_data[after.name]['online_times'][i]['end'] is None:
+                    user_data[after.name]['online_times'][i]['end'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    break
+        json.dump(user_data, 'user_status.json')
+        log_file.flush()
+      
 
 @bot.hybrid_command(name="getgpt")
 async def getgpt(ctx, *, query: str):
