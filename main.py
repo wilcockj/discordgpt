@@ -120,17 +120,15 @@ intents.message_content = True
 
 bot = commands.Bot(command_prefix="?", description=description, intents=intents)
 
-
-@bot.listen()
-async def on_member_update(before, after):
-    if before.status != after.status:         
-        logger.info(f'{after} is now {after.status}')  
-    logger.info(f'status is {after}')  
-
 @bot.event
 async def on_ready():
     logger.info(f"Logged in as {bot.user} (ID: {bot.user.id})\n--------")
 
+@bot.event
+async def on_member_update(before, after):
+    if before.status != after.status:         
+        logger.info(f'{after} is now {after.status}')  
+    logger.info(f'status is {after}')  
 
 @bot.hybrid_command(name="getgpt")
 async def getgpt(ctx, *, query: str):
