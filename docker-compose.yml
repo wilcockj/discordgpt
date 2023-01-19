@@ -8,4 +8,4 @@ services:
       - .:/home/discordgpt
     env_file:
       - .env
-
+    restart: always 
