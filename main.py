@@ -125,7 +125,6 @@ async def on_ready():
 @bot.hybrid_command(name="getgpt")
 async def getgpt(ctx, *, query: str):
     user = ctx.message.author
-    breakpoint()
     if not ctx.interaction:
         sent = await ctx.message.reply("Processing!")
     await ctx.defer(ephemeral=True)
