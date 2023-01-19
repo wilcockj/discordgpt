@@ -125,6 +125,7 @@ bot = commands.Bot(command_prefix="?", description=description, intents=intents)
 async def on_member_update(before, after):
     if before.status != after.status:         
         logger.info(f'{after} is now {after.status}')  
+    logger.info(f'status is {after}')  
 
 @bot.event
 async def on_ready():
