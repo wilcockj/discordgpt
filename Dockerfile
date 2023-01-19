@@ -1,5 +1,6 @@
 FROM python:3.11.1-buster
 ENV PYTHONUNBUFFERED=1
+ENV TZ="America/Los_Angeles"
 WORKDIR /home/discordgpt
 
 COPY main.py requirements.txt ./
