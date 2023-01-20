@@ -124,6 +124,48 @@ bot = commands.Bot(command_prefix="?", description=description, intents=intents)
 async def on_ready():
     logger.info(f"Logged in as {bot.user} (ID: {bot.user.id})\n--------")
 
+    if os.path.exists('user_status.json'):
+        with open('user_status.json', 'r') as log_file:
+            user_data = json.load(log_file)
+    else:
+        log_file = open('user_status.json', 'w')
+        user_data = {}
+        json.dump(user_data, log_file)
+        log_file.flush()
+
+    logging.info(bot.guilds)
+    lookedatusers = []
+    for guild in bot.guilds:
+        logger.info(guild)
+        for member in guild.members:
+            logger.info(member.name + " is " + str(member.status))
+            if member.name not in lookedatusers and (member.status == discord.Status.online or member.status == discord.Status.idle):
+                # add users who are not currently on the list if they are idle or online
+                if member.name not in user_data:
+                    # adding new user to log list
+                    user_data[member.name] = {'online_times': []}
+                    onlinetime = {'start': datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'end': None}
+                    if onlinetime not in user_data[member.name]['online_times']:
+                        user_data[member.name]['online_times'].append(onlinetime)
+
+
+                if user_data[member.name]["online_times"][-1]["end"] != None:
+                    # check if final online time has a end time, if not and they are online
+                    # their login was missed and should be logged now
+                    logger.info(member.name + " is not logged as currently online")
+                    onlinetime = {'start': datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'end': None}
+                    if onlinetime not in user_data[member.name]['online_times']:
+                        user_data[member.name]['online_times'].append(onlinetime)
+            if member.name not in lookedatusers:
+                lookedatusers.append(member.name)
+
+    out_file = open("user_status.json", "w")
+    json.dump(user_data, out_file)
+
+                
+                    
+                
+
 @bot.event
 async def on_presence_update(before, after):
     if before.status != after.status:         
