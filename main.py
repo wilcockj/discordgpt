@@ -135,6 +135,9 @@ async def on_ready():
 
     logging.info(bot.guilds)
     lookedatusers = []
+    # checking all online users to make sure they are logged if online
+    # and to make sure they are added to the list to avoid keyerrors
+    # from missing users
     for guild in bot.guilds:
         logger.info(guild)
         for member in guild.members:
