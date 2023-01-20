@@ -65,7 +65,7 @@ def add_data(time, query, reply):
     conn.close()
 
 
-def getGPTComplete(input):
+async def getGPTComplete(input):
     logger.info(f'Sending query for gpt3 with message "{input}"')
     response = openai.Completion.create(
         engine="text-davinci-003",
@@ -83,7 +83,7 @@ def getGPTComplete(input):
     )
     return finish_reason, text
 
-def getCodexComplete(input):
+async def getCodexComplete(input):
     logger.info(f'Sending query for gpt3 with message "{input}"')
     response = openai.Completion.create(
         engine="code-davinci-002",
@@ -101,7 +101,7 @@ def getCodexComplete(input):
     )
     return finish_reason, text
 
-def getDALLE(input):
+async def getDALLE(input):
     logger.info(f'Sending query for dalle with message "{input}"')
     try:
         response = openai.Image.create(prompt=input, n=1, size="512x512")
@@ -160,7 +160,7 @@ async def getgpt(ctx, *, query: str):
         sent = await ctx.message.reply("Processing!")
     await ctx.defer(ephemeral=True)
     start_time = time.time()
-    finish_reason, resp = getGPTComplete(query)
+    finish_reason, resp = await getGPTComplete(query)
     total_time = time.time() - start_time
     total_time = round(total_time, 2)
     logger.info(f'GPT query for input "{query}" took {total_time}s')
@@ -192,7 +192,7 @@ async def getcodex(ctx, *, query: str):
         sent = await ctx.message.reply("Processing!")
     await ctx.defer(ephemeral=True)
     start_time = time.time()
-    finish_reason, resp = getCodexComplete(query)
+    finish_reason, resp = await getCodexComplete(query)
     total_time = time.time() - start_time
     total_time = round(total_time, 2)
     logger.info(f'GPT query for input "{query}" took {total_time}s')
@@ -224,7 +224,7 @@ async def getdalle(ctx, *, query: str):
         sent = await ctx.message.reply("Processing!")
     await ctx.defer(ephemeral=True)
     start_time = time.time()
-    image, buffer = getDALLE(query)
+    image, buffer = await getDALLE(query)
     total_time = time.time() - start_time
     total_time = round(total_time, 2)
     logger.info(f'DALLE query for input "{query}" took {total_time}s')
