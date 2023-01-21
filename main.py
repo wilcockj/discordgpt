@@ -159,9 +159,9 @@ async def on_ready():
                     onlinetime = {'start': datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'end': None}
                     if onlinetime not in user_data[member.name]['online_times']:
                         user_data[member.name]['online_times'].append(onlinetime)
-            if member.status == discord.Status.idle:
+            if member.status == discord.Status.idle or member.status == discord.Status.dnd:
                 if member.name not in user_data:
-                    # adding new user to log list but since idle do not add start
+                    # adding new user to log list but since idle/do not disturb do not add start
                     # or end time
                     user_data[member.name] = {'online_times': []}
                     
